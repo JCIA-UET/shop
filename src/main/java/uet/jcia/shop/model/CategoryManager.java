@@ -5,7 +5,7 @@ import java.util.List;
 public class CategoryManager implements ItemManager {
 
 	@Override
-	public List<Item> getAllItems(ItemsTypes itemsType) {
+	public List<Item> getAllItems() {
 		// TODO Auto-generated method stub
 		return null;
 	}

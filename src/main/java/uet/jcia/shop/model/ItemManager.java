@@ -13,7 +13,7 @@ public interface ItemManager {
 	 * get all items by item type
 	 * @return
 	 */
-	List<Item> getAllItems(ItemsTypes itemsType);
+	List<Item> getAllItems();
 	
 	/**
 	 * get an item by id
