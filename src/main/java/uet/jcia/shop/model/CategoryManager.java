@@ -1,9 +1,8 @@
 package uet.jcia.shop.model;
 
-import java.util.Date;
 import java.util.List;
 
-public class OrderManager implements ItemManager {
+public class CategoryManager implements ItemManager {
 
 	@Override
 	public List<Item> getAllItems(ItemsTypes itemsType) {
@@ -28,17 +27,5 @@ public class OrderManager implements ItemManager {
 		// TODO Auto-generated method stub
 		return false;
 	}
- 
-	public List<Item> getTopSellingProduct(int n) {
-		return null;
-	}
-	
-	public double calDailyRevenue(Date date) {
-		return 0;
-	}
-	
-	public double calTotalRevenue() {
-		return 0;
-	}
-}
 
+}
