@@ -201,8 +201,7 @@ public class OrderManager implements ItemManager {
 	public double calTotalRevenue() {
 		return 0;
 	}
-	
-	// Please don't care about these code below. Do not modify!
+
 	@Override
 	public boolean setItem(int id, Item newItem) {
 		// TODO Auto-generated method stub

@@ -99,33 +99,23 @@ public class CategoryManager implements ItemManager {
 			return false;
 		}
 		
-		try {
-			boolean doesExist = true;
-			
+		if (getItemById(id) == null) {
+			return false;
+		}
+		
+		try {			
 			String query =
 					"update category " + 
 					"set categoryID= ?, categoryName= ? " +
 					"where categoryID= ?";
 						
-			if (getItemById(id) == null) {
-				doesExist = false;
-				query = "insert into category "	+
-						"(categoryID, categoryName) " +
-						"values " +
-						"(?, ?)";
-				
-			}
-			
 			con = dbConnector.createConnection();
 			PreparedStatement statement = con.prepareStatement(query);
 			
 			Category newCategory = (Category) newItem;
 			statement.setInt(1, newCategory.getId());
 			statement.setString(2, newCategory.getName());
-			
-			if (doesExist) {
-				statement.setInt(3, id);	
-			}
+			statement.setInt(3, id);	
 			
 			statement.execute();
 			con.close();
@@ -136,6 +126,41 @@ public class CategoryManager implements ItemManager {
 			return false;
 			
 		}
+	}
+	
+	@Override
+	public boolean addItem(Item newItem) {
+		if (!(newItem instanceof Category)) {
+			return false;
+		}
+		
+		int newCategoryId = newItem.getId();
+		if (getItemById(newCategoryId) != null) {
+			return false;
+		}
+		
+		try {			
+			String query = "insert into category "	+
+					"(categoryName) " +
+					"values " +
+					"(?)";
+						
+			con = dbConnector.createConnection();
+			PreparedStatement statement = con.prepareStatement(query);
+			
+			Category newCategory = (Category) newItem;
+			statement.setString(1, newCategory.getName());	
+			
+			statement.execute();
+			con.close();
+			return true;
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return false;
+			
+		}
+
 	}
 
 }

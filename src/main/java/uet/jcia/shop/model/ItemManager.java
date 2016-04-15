@@ -30,10 +30,17 @@ public interface ItemManager {
 	boolean removeItemById(int id);
 	
 	/**
-	 * set an item by id, use for create new or update
+	 * set an item by id, use for update
 	 * @param id
 	 * @param newItem
 	 * @return
 	 */
 	boolean setItem(int id, Item newItem);
+	
+	/**
+	 * create new item
+	 * @param newItem
+	 * @return
+	 */
+	boolean addItem(Item newItem);
 }
