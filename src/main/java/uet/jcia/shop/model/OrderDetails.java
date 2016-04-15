@@ -1,17 +1,17 @@
 package uet.jcia.shop.model;
 
 import java.util.Date;
-import java.util.List;
 
-public class OrderDetails extends Item {
-	private int productId;
+
+public class OrderDetails {
 	private int orderId;
-	private Date orderDate;
+	private int productId;
 	private int quantity;
+	private Date orderDate;
 	
 	public OrderDetails() {}
 	
-	public OrderDetails(int productId, int orderId, Date orderDate, int quantity) {
+	public OrderDetails(int orderId, int  productId, int quantity, Date orderDate) {
 		this.productId = productId;
 		this.orderId = orderId;
 		this.orderDate = orderDate;

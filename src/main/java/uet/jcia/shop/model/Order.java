@@ -1,6 +1,5 @@
 package uet.jcia.shop.model;
 
-import java.sql.*;
 import java.util.List;
 
 public class Order extends Item {
@@ -12,9 +11,22 @@ public class Order extends Item {
 	public Order() {}
 	
 	public Order(int customerId, List<OrderDetails> orderDetails) {
-		super();
 		this.customerId = customerId;
 		this.orderDetails = orderDetails;
+	}
+	
+	public Order(int orderId, int customerId, List<OrderDetails> orderDetails) {
+		this.id = orderId;
+		this.customerId = customerId;
+		this.orderDetails = orderDetails;
+	}
+	
+	public int getOrderId() {
+		return id;
+	}
+	
+	public void setOrderId(int id) {
+		this.id = id;
 	}
 	
 	public int getCustomerId() {
