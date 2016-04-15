@@ -3,7 +3,7 @@ package uet.jcia.shop.model;
 import java.sql.*;
 import java.util.List;
 
-public class Order extends Item implements ItemManager{
+public class Order extends Item {
 	private int customerId;
 	private List<OrderDetails> orderDetails;
 	

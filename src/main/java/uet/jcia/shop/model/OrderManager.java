@@ -78,10 +78,7 @@ public class OrderManager implements ItemManager {
 		Connection conn = dbconn.getConnection();
 		
 		try {
-			if(itemsType == ItemsTypes.CATEGORY) {
-				PreparedStatement stt = conn.prepareStatement(GET_ALL_ITEMS_QUERY);
-				stt.setInt(1, x);
-			}
+			PreparedStatement stt = conn.prepareStatement(GET_ALL_ITEMS_QUERY);
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
