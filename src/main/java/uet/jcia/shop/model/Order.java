@@ -1,12 +1,17 @@
 package uet.jcia.shop.model;
 
-public class Order extends Item {
+import java.sql.*;
+import java.util.List;
+
+public class Order extends Item implements ItemManager{
 	private int customerId;
-	private OrderDetails orderDetails;
+	private List<OrderDetails> orderDetails;
+	
+	
 	
 	public Order() {}
 	
-	public Order(int customerId, OrderDetails orderDetails) {
+	public Order(int customerId, List<OrderDetails> orderDetails) {
 		super();
 		this.customerId = customerId;
 		this.orderDetails = orderDetails;
@@ -19,13 +24,15 @@ public class Order extends Item {
 		this.customerId = customerId;
 	}
 	
-	public OrderDetails getOrderDetails() {
+	public List<OrderDetails> getOrderDetails() {
 		return orderDetails;
 	}
 	
-	public void setOrderDetails(OrderDetails orderDetails) {
+	public void setOrderDetails(List<OrderDetails> orderDetails) {
 		this.orderDetails = orderDetails;
 	}
+	
+
 
 	
 }
