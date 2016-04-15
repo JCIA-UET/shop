@@ -1,6 +1,6 @@
 package uet.jcia.shop.model;
 
-public abstract class Account {
+public class Account {
 	public static final String CUSTOMER = "customer";
 	public static final String STAFF = "staff";
 	

@@ -5,9 +5,9 @@ import java.sql.*;
 public class DBConnector {
 	private static final String JDBC_DRIVER = "com.mysql.jdbc.Driver";
 
-	private static final String DB_URL = "jdbc:mysql://localhost:3306/shop";
-	private static final String USERNAME = "root"; 
-	private static final String PASSWORD = "26031812";
+	private static final String DB_URL = "jdbc:mysql://localhost:3306/shop?useSSL=false";
+	private static final String USERNAME = "bqcuong"; 
+	private static final String PASSWORD = "buiquangcuong";
 	private static Connection con = null;
 	private static DBConnector connector = new DBConnector();
 	
