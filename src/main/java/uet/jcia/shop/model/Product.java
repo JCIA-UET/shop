@@ -53,6 +53,12 @@ public class Product extends Item {
 
 	public void setDescription(String description) {
 		this.description = description;
+	}
+
+	@Override
+	public String toString() {
+		return "Product [quantity=" + quantity + ", price=" + price + ", categoryId=" + categoryId + ", description="
+				+ description + ", id=" + id + ", name=" + name + "]";
 	}	
 	
 }

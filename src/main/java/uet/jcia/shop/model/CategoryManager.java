@@ -1,6 +1,7 @@
 package uet.jcia.shop.model;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -43,13 +44,13 @@ public class CategoryManager implements ItemManager {
 	public Item getItemById(int id) {
 		try {
 			con = dbConnector.createConnection();
-			Statement statement = con.createStatement();
-			String query = String.format(
-					"select * from category " +
-					"where categoryID=%d",
-					id);
+			String query = "select * from category " +
+							"where categoryID= ?";
 			
-			ResultSet rs = statement.executeQuery(query);
+			PreparedStatement statement = con.prepareStatement(query);
+			statement.setInt(1, id);
+			
+			ResultSet rs = statement.executeQuery();
 			Item category = null;
 			
 			if (rs.next()) {
@@ -75,13 +76,13 @@ public class CategoryManager implements ItemManager {
 		
 		try {
 			con = dbConnector.createConnection();
-			Statement statement = con.createStatement();
-			String query = String.format(
-					"delete from category " +
-					"where categoryID=%d",
-					id);
+			String query = "delete from category " +
+							"where categoryID= ?";
 			
-			statement.executeUpdate(query);
+			PreparedStatement statement = con.prepareStatement(query);
+			statement.setInt(1, id);
+			statement.execute();
+
 			con.close();
 			return true;
 			
@@ -93,33 +94,44 @@ public class CategoryManager implements ItemManager {
 
 	@Override
 	public boolean setItem(int id, Item newItem) {
+		
+		if (!(newItem instanceof Category)) {
+			return false;
+		}
+		
 		try {
-			con = dbConnector.createConnection();
-			Statement statement = con.createStatement();
+			boolean doesExist = true;
 			
-			String query = String.format(
+			String query =
 					"update category " + 
-					"set categoryID=%d, categoryName=\"%s\" " +
-					"where categoryID=%d",
-					newItem.getId(), newItem.getName(),
-					id);
-			
+					"set categoryID= ?, categoryName= ? " +
+					"where categoryID= ?";
+						
 			if (getItemById(id) == null) {
-				query = String.format(
-						"insert into category "	+
+				doesExist = false;
+				query = "insert into category "	+
 						"(categoryID, categoryName) " +
 						"values " +
-						"(%d, \"%s\")",
-						newItem.getId(), newItem.getName());
+						"(?, ?)";
 				
 			}
-						
-			statement.executeUpdate(query);
+			
+			con = dbConnector.createConnection();
+			PreparedStatement statement = con.prepareStatement(query);
+			
+			Category newCategory = (Category) newItem;
+			statement.setInt(1, newCategory.getId());
+			statement.setString(2, newCategory.getName());
+			
+			if (doesExist) {
+				statement.setInt(3, id);	
+			}
+			
+			statement.execute();
 			con.close();
 			return true;
 			
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return false;
 			
