@@ -40,5 +40,11 @@ public class OrderManager implements ItemManager {
 	public double calTotalRevenue() {
 		return 0;
 	}
+
+	@Override
+	public boolean addItem(Item newItem) {
+		// TODO Auto-generated method stub
+		return false;
+	}
 }
 
