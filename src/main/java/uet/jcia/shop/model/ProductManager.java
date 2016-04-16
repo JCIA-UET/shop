@@ -112,9 +112,11 @@ public class ProductManager implements ItemManager {
 			return false;
 		}
 		
-		try {
-			boolean doesExist = true;
-			
+		if (getItemById(id) == null) {
+			return false;
+		}
+		
+		try {			
 			String query =
 					"update product " + 
 					"set " +
@@ -122,18 +124,6 @@ public class ProductManager implements ItemManager {
 					"quantity= ?, categoryId= ?, description= ?" +
 					"where productID= ?";
 						
-			if (getItemById(id) == null) {
-				doesExist = false;
-				query = "insert into product "	+
-						"(" +
-						"productID, productName, price, " +
-						"quantity, categoryId, description" +
-						") " +
-						"values " +
-						"(?, ?, ?, ?, ?, ?)";
-				
-			}
-			
 			con = dbConnector.createConnection();
 			PreparedStatement statement = con.prepareStatement(query);
 			
@@ -143,11 +133,44 @@ public class ProductManager implements ItemManager {
 			statement.setDouble(3, newProduct.getPrice());
 			statement.setInt(4, newProduct.getQuantity());
 			statement.setInt(5, newProduct.getCategoryId());
-			statement.setString(6, newProduct.getDescription());
+			statement.setString(6, newProduct.getDescription());	
+			statement.setInt(7, id);
 			
-			if (doesExist) {
-				statement.setInt(7, newItem.getId());
-			}
+			statement.execute();
+			con.close();
+			return true;
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return false;	
+		}
+	}
+
+	@Override
+	public boolean addItem(Item newItem) {
+		if (!(newItem instanceof Product)) {
+			return false;
+		}
+		
+		int newProductId = newItem.getId();
+		if (getItemById(newProductId) != null) {
+			return false;
+		}
+		
+		try {			
+			String query = "insert into product "	+
+					"(productName, price, quantity, categoryId, description) " + 
+					"values (?, ?, ?, ?, ?)";
+						
+			con = dbConnector.createConnection();
+			PreparedStatement statement = con.prepareStatement(query);
+			
+			Product newProduct = (Product) newItem;
+			statement.setString(1, newProduct.getName());
+			statement.setDouble(2, newProduct.getPrice());
+			statement.setInt(3, newProduct.getQuantity());
+			statement.setInt(4, newProduct.getCategoryId());
+			statement.setString(5, newProduct.getDescription());	
 			
 			statement.execute();
 			con.close();

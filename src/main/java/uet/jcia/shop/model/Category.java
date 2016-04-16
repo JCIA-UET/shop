@@ -10,6 +10,10 @@ public class Category extends Item {
 		super(id, name);
 	}
 
+	public Category(String name) {
+		super(name);
+	}
+	
 	@Override
 	public String toString() {
 		return "Category [id=" + id + ", name=" + name + "]";

@@ -60,6 +60,7 @@ public class AccountManager {
 				account = new Account(
 						username, password, accountId,
 						email, accountType);
+
 			}
 			
 			con.close();
@@ -71,6 +72,7 @@ public class AccountManager {
 		}
 	}
 	
+
 	
 	public Account authenticate(String username , String password){
 		Account account = getAccountByUsername(username);
@@ -79,7 +81,7 @@ public class AccountManager {
 			return null;
 		}
 		return account;
-	}
+}
 	
 	public void insertAccount(Account a){
 		String sqlCommand = "insert into " + table + " value(?,?,?,?,?) ;";
@@ -100,12 +102,13 @@ public class AccountManager {
 		
 	}
 	
-	public static void main(String[] args) {
-		AccountManager test = new AccountManager();
-		System.out.println(test.authenticate("hie", "cuong"));
-		System.out.println(test.authenticate("hieu", "hieu"));
-		//Account a = new Customer("hieusonson","hieusonson",12,"hfeufhsf");
-		//test.insertAccount(a);
-	}
+//	public static void main(String[] args) {
+//		AccountManager test = new AccountManager();
+//		System.out.println(test.authenticate("hie", "cuong"));
+//		System.out.println(test.authenticate("hieu", "hieu"));
+//		Account a = new Customer("hieusonson","hieusonson",12,"hfeufhsf");
+//		test.insertAccount(a);
+//	}
+
 	
 }
