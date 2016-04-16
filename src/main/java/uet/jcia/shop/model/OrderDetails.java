@@ -1,17 +1,17 @@
 package uet.jcia.shop.model;
 
-import java.util.Date;
+import java.sql.Timestamp;
 
 
 public class OrderDetails {
 	private int orderId;
 	private int productId;
 	private int quantity;
-	private Date orderDate;
+	private Timestamp orderDate;
 	
 	public OrderDetails() {}
 	
-	public OrderDetails(int orderId, int  productId, int quantity, Date orderDate) {
+	public OrderDetails(int orderId, int  productId, int quantity, Timestamp orderDate) {
 		this.productId = productId;
 		this.orderId = orderId;
 		this.orderDate = orderDate;
@@ -30,10 +30,10 @@ public class OrderDetails {
 	public void setOrderId(int orderId) {
 		this.orderId = orderId;
 	}
-	public Date getOrderDate() {
+	public Timestamp getOrderDate() {
 		return orderDate;
 	}
-	public void setOrderDate(Date orderDate) {
+	public void setOrderDate(Timestamp orderDate) {
 		this.orderDate = orderDate;
 	}
 	public int getQuantity() {
@@ -41,5 +41,10 @@ public class OrderDetails {
 	}
 	public void setQuantity(int quantity) {
 		this.quantity = quantity;
+	}
+	
+	@Override
+	public String toString() {
+		return String.format("ProductID:" + productId + " OrderID:" + orderId + " Quantity:" + quantity + " Order Date:" + orderDate);
 	}
 }

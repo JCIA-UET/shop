@@ -10,6 +10,11 @@ public class Order extends Item {
 	
 	public Order() {}
 	
+	public Order(int customerId) {
+		this.customerId = customerId;
+		this.orderDetails = null;
+	}
+	
 	public Order(int customerId, List<OrderDetails> orderDetails) {
 		this.customerId = customerId;
 		this.orderDetails = orderDetails;

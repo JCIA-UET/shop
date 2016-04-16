@@ -4,17 +4,20 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 public class OrderManager implements ItemManager {
 	private Connection conn = null;
 	
-	private final String GET_ORDER_BY_ID_QUERY  = "SELECT * FROM order WHERE orderID=?";
-	private final String GET_ALL_ORDERS_QUERY    = "FIND * INTO order";
-	private final String GET_DETAILS_BY_ORDER_ID = "SELECT * FROM orderdetail WHERE orderID=?";
-	private final String DELETE_ORDER_BY_ID      = "DELETE FROM order WHERE orderID=?";
-	private final String ADD_ORDER 				 = "INSERT INTO order (customerID) VALUES(?)";
+	private final String GET_ORDER_BY_ID_QUERY  = "SELECT * FROM shop.order WHERE orderID=?";
+	private final String GET_ALL_ORDERS_QUERY    = "SELECT * FROM shop.order";
+	private final String GET_DETAILS_BY_ORDER_ID = "SELECT * FROM shop.orderdetail WHERE orderID=?";
+	private final String DELETE_ORDER_BY_ID      = "DELETE FROM shop.order WHERE orderID=?";
+	private final String ADD_NEW_ORDER 				 = "INSERT INTO shop.order (customerID) VALUES(?)";
+	private final String GET_TOP_SELLING_PRODUCT = "SELECT product.productID, SUM(orderdetail.Quantity) AS Quantity FROM orderdetail INNER JOIN product ON product.productID = orderdetail.productID GROUP BY orderdetail.productID ORDER BY Quantity DESC LIMIT ?";
 	
 	/**
 	 * get order 
@@ -40,7 +43,7 @@ public class OrderManager implements ItemManager {
 			
 			item = new Order(id, customerID, list);
 			
-			System.out.println("OrderID: " + item.getOrderId() + " CustomerID: " + item.getCustomerId());
+			//System.out.println("OrderID: " + item.getOrderId() + " CustomerID: " + item.getCustomerId());
 		} catch (SQLException e) {
 			e.printStackTrace();
 			System.out.println("Fail!");
@@ -67,7 +70,7 @@ public class OrderManager implements ItemManager {
 	public List<Item> getAllItems() {
 		// TODO Auto-generated method stub
 		conn = dbConnector.createConnection();
-		List<Item> resultList = null;
+		List<Item> resultList = new ArrayList<>();
 		
 		try {
 			PreparedStatement stt = conn.prepareStatement(GET_ALL_ORDERS_QUERY);
@@ -79,6 +82,7 @@ public class OrderManager implements ItemManager {
 				
 				Order element = new Order(orderID, customerID, list);
 				resultList.add(element);
+				System.out.println("OrderID: " + element.getOrderId() + " CustomerID: " + element.getCustomerId() + " Details: " + element.getOrderDetails());
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -138,7 +142,7 @@ public class OrderManager implements ItemManager {
 	 */
 	public List<OrderDetails> GetDetailsById(int id) {
 		conn = dbConnector.createConnection();
-		List<OrderDetails> list = null;
+		List<OrderDetails> list = new ArrayList<>();
 		
 		try {
 			PreparedStatement stt = conn.prepareStatement(GET_DETAILS_BY_ORDER_ID);
@@ -146,9 +150,9 @@ public class OrderManager implements ItemManager {
 			ResultSet rs = stt.executeQuery();
 			while(rs.next()) {
 				int orderId = rs.getInt("orderID");
-				int productId = rs.getInt("produtID");
+				int productId = rs.getInt("productID");
 				int quantity = rs.getInt("quantity");
-				Date orderDate = rs.getDate("orderDate");
+				Timestamp orderDate = rs.getTimestamp("orderDate");
 				
 				OrderDetails temp = new OrderDetails(productId, orderId, quantity, orderDate);
 				list.add(temp);
@@ -160,18 +164,16 @@ public class OrderManager implements ItemManager {
 		
 		return list;
 	}
-
+	
+	@Override
 	public boolean addItem(Item newItem) {
 		if(!(newItem instanceof Order)) return false;
-		
 		conn = dbConnector.createConnection();
 		
 		try {
-			PreparedStatement stt = conn.prepareStatement(ADD_ORDER);
+			PreparedStatement stt = conn.prepareStatement(ADD_NEW_ORDER);
 			Order currentItem = (Order)newItem;
 			int customerID = currentItem.getCustomerId();
-			int orderID = currentItem.getId();
-			List<OrderDetails> list = this.GetDetailsById(orderID);
 			stt.setInt(1, customerID);
 			
 			stt.executeUpdate();
@@ -191,6 +193,23 @@ public class OrderManager implements ItemManager {
 	 */
 	public List<Item> getTopSellingProduct(int n) {
 		conn = dbConnector.createConnection();
+		List<Item> list = new ArrayList<>();
+		ProductManager pm = new ProductManager();
+		
+		try {
+			PreparedStatement stt = conn.prepareStatement(GET_TOP_SELLING_PRODUCT);
+			stt.setInt(1, n);
+			ResultSet rs = stt.executeQuery();
+			while(rs.next()) {
+				int productID = rs.getInt("productID");
+				Product product = (Product)pm.getItemById(productID);
+				list.add(product);
+			}
+			return list;
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		return null;
 	}
 	

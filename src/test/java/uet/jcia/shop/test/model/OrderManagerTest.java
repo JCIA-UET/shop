@@ -1,8 +1,11 @@
 package uet.jcia.shop.test.model;
 
 import uet.jcia.shop.model.*;
-import java.util.*;
 
+/**
+ * @author dinht_000
+ *
+ */
 public class OrderManagerTest {
 
 	public static void main(String[] args) {
@@ -10,15 +13,20 @@ public class OrderManagerTest {
 		Item newOrder = null;
 		Item newOrderDetails = null;
 		
-		newOrder = new Order(1, null);
+		//System.out.println("Get order by id:");
+		//orderManager.getItemById(1);
+		System.out.println("Get All Order:");
+		orderManager.getAllItems();
+		//System.out.println("Get details:");
+		//System.out.println(orderManager.GetDetailsById(1));
+		System.out.println("Remove Order");
+		orderManager.removeItemById(1);
+		System.out.println("Get All Order:");
+		orderManager.getAllItems();
+		
+		newOrder = new Order(1);
 		orderManager.addItem(newOrder);
 		
-		newOrder = new Order(2, null);
-		orderManager.addItem(newOrder);
-		
-		newOrder = new Order(3, null);
-		orderManager.addItem(newOrder);
-		
-		System.out.println(orderManager.getItemById(1));
+		orderManager.getTopSellingProduct(10);
 	}
 }
