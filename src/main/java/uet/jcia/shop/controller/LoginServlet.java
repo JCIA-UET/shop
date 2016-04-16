@@ -1,11 +1,15 @@
 package uet.jcia.shop.controller;
 
 import java.io.IOException;
+
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import uet.jcia.shop.model.AccountManager;
 
 /**
  * Servlet implementation class LoginServlet
@@ -27,15 +31,30 @@ public class LoginServlet extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
-		response.getWriter().append("Served at: ").append(request.getContextPath());
+			
+			
 	}
-
-	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
-	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
-		doGet(request, response);
+		String username = request.getParameter("username");
+		String password = request.getParameter("password");
+		String typeOfAccount = checkAccount(username, password);
+		if(typeOfAccount.equals("CUSTOMER")){
+			RequestDispatcher rs = request.getRequestDispatcher("/home.jsp");
+			rs.forward(request, response);
+		}
+		else if(typeOfAccount.equals("STAFF")){
+			RequestDispatcher rs = request.getRequestDispatcher("/homeAd.jsp");
+			rs.forward(request, response);
+		}
+		else {
+			RequestDispatcher rs = request.getRequestDispatcher("/login.jsp");
+			rs.forward(request, response);
+		}
+	}
+	private String checkAccount(String username, String password){
+		AccountManager accountManager = new AccountManager();
+		return accountManager.authenticate(username, password);
 	}
 
 }

@@ -9,37 +9,76 @@ public class AccountManager {
 	DBConnector  dbconnector = DBConnector.getInstance();
 	private String table = "account";
 	
-	private ResultSet getAccount(String username, String password){
+	private Account getAccountByUsername(String username){
 		ResultSet rs = null ;
-		String sqlcommand = "select account.accountType from "+table+" where account.username = ? AND account.password = ? ;";
+		String sqlcommand = "select * from "+table+" where account.username = ?;";
 		PreparedStatement pts = null;
+		Account account = null;
 		try {
-			pts = dbconnector.getConnection().prepareStatement(sqlcommand);
+			Connection con = dbconnector.createConnection();
+			pts = con.prepareStatement(sqlcommand);
 			pts.setString(1, username);
-			pts.setString(2, password);
 			rs = pts.executeQuery();
-			return rs;
-		} catch (Exception e) {
-			System.out.println("the Query ERRO!!   " + e.toString());
-		}
-		return null;
-	}
-	
-	public String authenticate(String username , String password){
-		ResultSet rs = this.getAccount(username, password);
-		try {
-			String typeOfAccount = null;
-			while(rs.next()){
-				typeOfAccount = rs.getString(1);
-			}
-			return typeOfAccount;
-		} catch (SQLException e) {
 			
-			// TODO Auto-generated catch block
+			if (rs.next()) {
+				int accountId = rs.getInt(1);
+				String password = rs.getString(3);
+				String email = rs.getString(4);
+				String accountType = rs.getString(5);
+				
+				account = new Account(
+						username, password, accountId,
+						email, accountType);
+			}
+			
+			con.close();
+			return account;
+			
+		} catch (Exception e) {
 			e.printStackTrace();
 			return null;
 		}
-		
+	}
+	
+	private Account getAccountById(int accountId){
+		ResultSet rs = null ;
+		String sqlcommand = "select * from "+table+" where account.accountId = ?;";
+		PreparedStatement pts = null;
+		Account account = null;
+		try {
+			Connection con = dbconnector.createConnection();
+			pts = con.prepareStatement(sqlcommand);
+			pts.setInt(1, accountId);
+			rs = pts.executeQuery();
+			
+			if (rs.next()) {
+				String username = rs.getString(2);
+				String password = rs.getString(3);
+				String email = rs.getString(4);
+				String accountType = rs.getString(5);
+				
+				account = new Account(
+						username, password, accountId,
+						email, accountType);
+			}
+			
+			con.close();
+			return account;
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
+	
+	public Account authenticate(String username , String password){
+		Account account = getAccountByUsername(username);
+		if (account == null ||
+			!account.getPassword().equals(password)) {
+			return null;
+		}
+		return account;
 	}
 	
 	public void insertAccount(Account a){
@@ -47,7 +86,7 @@ public class AccountManager {
 		PreparedStatement pst = null;
 		
 		try {
-			pst = dbconnector.getConnection().prepareStatement(sqlCommand);
+			pst = dbconnector.createConnection().prepareStatement(sqlCommand);
 			pst.setInt(1, a.getAccountId() );
 			pst.setString(2,a.getUsername() );
 			pst.setString(3,a.getPassword() );
@@ -63,9 +102,10 @@ public class AccountManager {
 	
 	public static void main(String[] args) {
 		AccountManager test = new AccountManager();
-		System.out.println(test.authenticate("hieu", "cuong"));
-		Account a = new Customer("hieusonson","hieusonson",12,"hfeufhsf");
-		test.insertAccount(a);
+		System.out.println(test.authenticate("hie", "cuong"));
+		System.out.println(test.authenticate("hieu", "hieu"));
+		//Account a = new Customer("hieusonson","hieusonson",12,"hfeufhsf");
+		//test.insertAccount(a);
 	}
 	
 }
