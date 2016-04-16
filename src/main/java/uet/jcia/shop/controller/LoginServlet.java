@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import uet.jcia.shop.model.Account;
 import uet.jcia.shop.model.AccountManager;
 
 /**
@@ -38,12 +39,15 @@ public class LoginServlet extends HttpServlet {
 		// TODO Auto-generated method stub
 		String username = request.getParameter("username");
 		String password = request.getParameter("password");
-		String typeOfAccount = checkAccount(username, password);
-		if(typeOfAccount.equals("CUSTOMER")){
+		AccountManager accountManager = new AccountManager();
+		Account account = accountManager.authenticate(username, password);
+		
+	
+		if( account != null && account.getAccoutType().equals("CUSTOMER")){
 			RequestDispatcher rs = request.getRequestDispatcher("/home.jsp");
 			rs.forward(request, response);
 		}
-		else if(typeOfAccount.equals("STAFF")){
+		else if(account != null && account.getAccoutType().equals("STAFF")){
 			RequestDispatcher rs = request.getRequestDispatcher("/homeAd.jsp");
 			rs.forward(request, response);
 		}
@@ -52,9 +56,6 @@ public class LoginServlet extends HttpServlet {
 			rs.forward(request, response);
 		}
 	}
-	private String checkAccount(String username, String password){
-		AccountManager accountManager = new AccountManager();
-		return accountManager.authenticate(username, password);
-	}
+	
 
 }
