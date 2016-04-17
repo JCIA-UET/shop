@@ -40,7 +40,7 @@ public class AccountManager {
 		}
 	}
 	
-	private Account getAccountById(int accountId){
+	public Account getAccountById(int accountId){
 		ResultSet rs = null ;
 		String sqlcommand = "select * from "+table+" where account.accountId = ?;";
 		PreparedStatement pts = null;
