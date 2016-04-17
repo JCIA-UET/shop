@@ -9,7 +9,7 @@ public class AccountManager {
 	DBConnector  dbconnector = DBConnector.getInstance();
 	private String table = "account";
 	
-	private Account getAccountByUsername(String username){
+	public Account getAccountByUsername(String username){
 		ResultSet rs = null ;
 		String sqlcommand = "select * from "+table+" where account.username = ?;";
 		PreparedStatement pts = null;
@@ -40,21 +40,55 @@ public class AccountManager {
 		}
 	}
 	
-	public boolean authenticate(String username , String password){
+	public Account getAccountById(int accountId){
+		ResultSet rs = null ;
+		String sqlcommand = "select * from "+table+" where account.accountId = ?;";
+		PreparedStatement pts = null;
+		Account account = null;
+		try {
+			Connection con = dbconnector.createConnection();
+			pts = con.prepareStatement(sqlcommand);
+			pts.setInt(1, accountId);
+			rs = pts.executeQuery();
+			
+			if (rs.next()) {
+				String username = rs.getString(2);
+				String password = rs.getString(3);
+				String email = rs.getString(4);
+				String accountType = rs.getString(5);
+				
+				account = new Account(
+						username, password, accountId,
+						email, accountType);
+
+			}
+			
+			con.close();
+			return account;
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
+
+	
+	public Account authenticate(String username , String password){
 		Account account = getAccountByUsername(username);
 		if (account == null ||
 			!account.getPassword().equals(password)) {
-			return false;
+			return null;
 		}
-		return true;
-	}
+		return account;
+}
 	
 	public void insertAccount(Account a){
 		String sqlCommand = "insert into " + table + " value(?,?,?,?,?) ;";
 		PreparedStatement pst = null;
 		
 		try {
-			pst = dbconnector.getConnection().prepareStatement(sqlCommand);
+			pst = dbconnector.createConnection().prepareStatement(sqlCommand);
 			pst.setInt(1, a.getAccountId() );
 			pst.setString(2,a.getUsername() );
 			pst.setString(3,a.getPassword() );
@@ -70,9 +104,11 @@ public class AccountManager {
 	
 //	public static void main(String[] args) {
 //		AccountManager test = new AccountManager();
-//		System.out.println(test.authenticate("hieu", "cuong"));
+//		System.out.println(test.authenticate("hie", "cuong"));
+//		System.out.println(test.authenticate("hieu", "hieu"));
 //		Account a = new Customer("hieusonson","hieusonson",12,"hfeufhsf");
 //		test.insertAccount(a);
 //	}
+
 	
 }
