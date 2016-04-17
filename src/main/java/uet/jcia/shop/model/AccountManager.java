@@ -9,7 +9,7 @@ public class AccountManager {
 	DBConnector  dbconnector = DBConnector.getInstance();
 	private String table = "account";
 	
-	private Account getAccountByUsername(String username){
+	public Account getAccountByUsername(String username){
 		ResultSet rs = null ;
 		String sqlcommand = "select * from "+table+" where account.username = ?;";
 		PreparedStatement pts = null;
