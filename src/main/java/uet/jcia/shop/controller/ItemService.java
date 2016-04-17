@@ -116,7 +116,7 @@ public class ItemService extends HttpServlet {
 			double price = Double.parseDouble(priceStr);
 			String quantityStr = request.getParameter("quantity");
 			int quantity = Integer.parseInt(quantityStr);
-			String categoryIdStr = request.getParameter("categoryname");
+			String categoryIdStr = request.getParameter("categoryid");
 			int categoryId = Integer.parseInt(categoryIdStr);
 			String description = request.getParameter("description");
 			
@@ -159,20 +159,29 @@ public class ItemService extends HttpServlet {
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		HttpSession session = request.getSession();
+		String destination = (String) session.getAttribute("request_from");
 		Account account = (Account) session.getAttribute("session_account");
+		
+		if (account == null) {
+			request.setAttribute("message", "You have not logged in");
+			forwardStream(request, response, destination);
+		}
+		
 		String accountType = account.getAccoutType();
-		if (!accountType.equals("staff")) return ;
+		if (!accountType.equalsIgnoreCase("STAFF")) {
+			request.setAttribute("message", "You have not privilege");
+			forwardStream(request, response, destination);
+		}
 		
 		String action = request.getParameter("action");
 		String itemType = request.getParameter("itemtype");
 		String itemId = request.getParameter("itemid");
 		
-		if (action == null || itemType == null || itemId == null)
+		if (action == null || itemType == null)
 			return ;
 				
 		boolean result = false;
 		String message = "cannot do this operation";
-		String destination = "haha.jsp";
 		
 		if (action.equals("remove")) {
 			int id = Integer.parseInt(itemId);
@@ -180,15 +189,14 @@ public class ItemService extends HttpServlet {
 			
 			if (result) {
 				message = "remove successfully!";
-				destination = "zv.jsp";
+				destination = "/home.jsp";
 			}
 			
 		} else if (action.equals("add")) {
-			addItemOpreation(itemType, request, response);
+			result = addItemOpreation(itemType, request, response);
 			
 			if (result) {
 				message = "add successully";
-				destination = "zv.jsp";
 			}
 		
 		} else if (action.equals("update")) {
@@ -197,7 +205,6 @@ public class ItemService extends HttpServlet {
 					
 			if (result) {
 				message = "add successully";
-				destination = "zp.jsp";
 			}
 		}
 		

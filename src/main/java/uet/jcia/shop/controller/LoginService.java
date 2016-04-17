@@ -1,28 +1,33 @@
 package uet.jcia.shop.controller;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import uet.jcia.shop.model.Account;
 import uet.jcia.shop.model.AccountManager;
+import uet.jcia.shop.model.Product;
 
 /**
- * Servlet implementation class LoginServlet
+ * Servlet implementation class LoginService
  */
-@WebServlet("/loginservlet")
-public class LoginServlet extends HttpServlet {
+@WebServlet("/LoginService")
+public class LoginService extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public LoginServlet() {
+    public LoginService() {
         super();
         // TODO Auto-generated constructor stub
     }
@@ -42,19 +47,31 @@ public class LoginServlet extends HttpServlet {
 		AccountManager accountManager = new AccountManager();
 		Account account = accountManager.authenticate(username, password);
 		
+		String message = "login successfully!";
 	
-		if( account != null && account.getAccoutType().equals("CUSTOMER")){
-			RequestDispatcher rs = request.getRequestDispatcher("/home.jsp");
-			rs.forward(request, response);
+		if (account != null) {
+			// set Account Object to the session
+			HttpSession session = request.getSession();
+			session.setAttribute("session_account", account);
+			
+			// if user is Customer, add shopping cart to the session
+			if(account.getAccoutType().equals("CUSTOMER")){
+				List<Product> shoppingCart = new ArrayList<>();
+				session.setAttribute("shopping_cart", shoppingCart);				
+			}
+			
+//			else if(account.getAccoutType().equals("STAFF")){
+//				
+//			}
+		
+		} else {
+			message = "login fail!";
 		}
-		else if(account != null && account.getAccoutType().equals("STAFF")){
-			RequestDispatcher rs = request.getRequestDispatcher("/homeAd.jsp");
-			rs.forward(request, response);
-		}
-		else {
-			RequestDispatcher rs = request.getRequestDispatcher("/login.jsp");
-			rs.forward(request, response);
-		}
+		
+		ServletContext context = getServletContext();
+		RequestDispatcher dispatcher = context.getRequestDispatcher("/login_result.jsp");
+		request.setAttribute("message", message);
+		dispatcher.forward(request, response);
 	}
 	
 
