@@ -5,11 +5,15 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<title>Shopping</title>
+<title>Categories List</title>
 <link href="style.css" rel="stylesheet"/>
 </head>
 <body>
-	<%session.setAttribute("request_from","/home.jsp"); %>
+	<%session.setAttribute("request_from","/categories-list.jsp"); %>
+	
+	<c:if test="${not empty message}">
+		<h2 style="color:blue;">${message}</h2>
+	</c:if>
 	
 	<c:choose>
 		<c:when test="${not empty sessionScope.session_account}">
@@ -20,37 +24,26 @@
 		</c:otherwise>
 	</c:choose>
 	
-	<c:if test="${not empty message}">
-		<h2 style="color:blue;">${message}</h2>
-	</c:if>
-	
 	<c:if test="${not empty items}">
 		<table>
 			<tr>
 				<th>ID</th>
 				<th>Name</th>
-				<th>Price</th>
-				<th>Category</th>
-				<th>Description</th>
-				<th>Operation</th>
 			</tr>
 			<c:forEach var="item" items="${items}">
 				<tr>
 					<td>${item.id}</td>
 					<td>${item.name}</td>
-					<td>${item.price}</td>
-					<td>${item.categoryId}</td>
-					<td>${item.description}</td>
 					<td>
 						<form action="ItemService" method="post">
 							<input type="hidden" name="action" value="update">
-							<input type="hidden" name="itemtype" value="PRODUCT">
+							<input type="hidden" name="itemtype" value="CATEGORY">
 							<input type="hidden" name="itemid" value="${item.id}">
 							<button type="submit">Update</button>
 						</form>
 						<form action="ItemService" method="post">
 							<input type="hidden" name="action" value="remove">
-							<input type="hidden" name="itemtype" value="PRODUCT">
+							<input type="hidden" name="itemtype" value="CATEGORY">
 							<input type="hidden" name="itemid" value="${item.id}">
 							<button type="submit">Remove</button>
 						</form>
@@ -58,20 +51,13 @@
 				</tr>
 			</c:forEach>
 		</table>
-	</c:if>	
+	</c:if>
 	
 	<br/>
-	<form action="ItemService" method="get">
-		<input type="hidden" name="action" value="getallitems">
-		<input type="hidden" name="itemtype" value="CATEGORY">
-		<button type="submit">See categories list</button>
-	</form>
-	<br/>
-	<form action="ItemService" method="post">
-		<input type="hidden" name="action" value="add">
-		<input type="hidden" name="itemtype" value="PRODUCT">
-		<button type="submit">Add more products</button>
-	</form>
-	
+		<form action="ItemService" method="post">
+			<input type="hidden" name="action" value="add">
+			<input type="hidden" name="itemtype" value="CATEGORY">
+			<button type="submit">Add more categories</button>
+		</form>
 </body>
 </html>

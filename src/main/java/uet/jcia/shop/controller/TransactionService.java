@@ -29,7 +29,7 @@ public class TransactionService extends HttpServlet {
 		HttpSession session = request.getSession();
 		Account account = (Account) session.getAttribute("session_account");
 		String accountType = account.getAccoutType();
-		if (!accountType.equals("staff")) return ;
+		if (!accountType.equals("STAFF")) return ;
 		
 		String action = request.getParameter("action");
 		if (action == null) return ;
