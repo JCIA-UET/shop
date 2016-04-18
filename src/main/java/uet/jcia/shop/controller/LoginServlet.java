@@ -8,6 +8,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import uet.jcia.shop.model.Account;
 import uet.jcia.shop.model.AccountManager;
@@ -37,11 +38,14 @@ public class LoginServlet extends HttpServlet {
 	}
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
+		HttpSession session = request.getSession();
+		
+		
 		String username = request.getParameter("username");
 		String password = request.getParameter("password");
 		AccountManager accountManager = new AccountManager();
 		Account account = accountManager.authenticate(username, password);
-		
+		session.setAttribute("account", account);
 	
 		if( account != null && account.getAccoutType().equals("CUSTOMER")){
 			RequestDispatcher rs = request.getRequestDispatcher("/home.jsp");
