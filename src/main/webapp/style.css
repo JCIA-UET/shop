@@ -1,0 +1,13 @@
+p.welcome {
+	position: fixed;
+	right: 5px;
+	top: 5px;
+}
+
+table, th, td {
+    border: 1px solid black;
+    border-collapse: collapse;
+}
+th, td {
+    padding: 5px;
+}

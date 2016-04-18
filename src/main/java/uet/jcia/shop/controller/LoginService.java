@@ -36,9 +36,10 @@ public class LoginService extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
-			
-			
+		Account account = new Account("bqc", "12345", 10, "cuong@vnu", "STAFF");
+		HttpSession session = request.getSession();
+		session.setAttribute("session_account", account);
+		response.getWriter().append("DONE");
 	}
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub

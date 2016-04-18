@@ -5,11 +5,11 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<title>Add new product</title>
+<title>Update product</title>
 <link href="style.css" rel="stylesheet"/>
 </head>
 <body>
-	<%session.setAttribute("request_from","/add-product.jsp"); %>
+	<%session.setAttribute("request_from","/update-product.jsp"); %>
 	<c:if test="${not empty message}">
 		<h2 style="color:blue;">${message}</h2>
 	</c:if>
@@ -23,20 +23,26 @@
 		</c:otherwise>
 	</c:choose>
 	
-	<form action="ItemService" method="post" id="add-product">
-		<input type="hidden" name="action" value="add">
+	<form action="ItemService" method="post" id="update-product">
+		<input type="hidden" name="action" value="update">
 		<input type="hidden" name="itemtype" value="PRODUCT">
+		<input type="hidden" id="itemid" name="itemid" value="${item.id}">
+		
+		<label for="productid">Product ID</label>
+		<br/>
+		<input type="text" id="productid" name="productid" value="${item.id}">
+		<br/>
 		<label for="productname">Product Name</label>
 		<br/>
-		<input type="text" id="productname" name="productname" required>
+		<input type="text" id="productname" name="productname" value="${item.name}" required>
 		<br/>
 		<label for="productprice">Price</label>
 		<br/>
-		<input type="number" step="0.01" id="productprice" name="productprice" required>
+		<input type="number" step="0.01" id="productprice" name="productprice" value="${item.price}" required>
 		<br/>
 		<label for="quantity">Quantity</label>
 		<br/>
-		<input type="number" id="quantity" name="quantity" required>
+		<input type="number" id="quantity" name="quantity" value="${item.quantity}" required>
 		<br/>
 		<label for="categoryid">Category</label>
 		<br/>
@@ -48,7 +54,7 @@
 		<br/>
 		<label for="description">Description</label>
 		<br/>
-		<textarea name="description" id="description" form="add-product"></textarea>
+		<textarea name="description" id="description" form="update-product">${item.description}</textarea>
 		<br/>
 		<br/>
 		<button type="submit">Submit</button>

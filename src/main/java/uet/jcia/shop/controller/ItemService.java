@@ -30,6 +30,131 @@ public class ItemService extends HttpServlet {
     public ItemService() {
         super();
     }
+    
+
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		HttpSession session = request.getSession();
+		String destination = (String) session.getAttribute("request_from");
+		Account account = (Account) session.getAttribute("session_account");
+		
+		if (account == null) {
+			request.setAttribute("message", "You have not logged in");
+			forwardStream(request, response, destination);
+			return ;
+		}
+		
+		String accountType = account.getAccoutType();
+		if (!accountType.equalsIgnoreCase("STAFF")) {
+			request.setAttribute("message", "You have not privilege");
+			forwardStream(request, response, destination);
+			return;
+		}
+		
+		String action = request.getParameter("action");
+		String itemType = request.getParameter("itemtype");
+		String itemId = request.getParameter("itemid");
+		
+		if (action == null || itemType == null)
+			return ;
+				
+		boolean result = false;
+		String message = "cannot do this operation";
+		
+		if (action.equals("remove")) {
+			int id = Integer.parseInt(itemId);
+			result = removeItemOperation(itemType, id);
+			
+			if (result) {
+				message = "remove successfully!";
+				destination = "/home.jsp";
+			}
+			
+		} else if (action.equals("add")) {
+//			System.out.println(destination);
+//			System.out.println(destination.matches("/add-.*"));
+			
+			if (!destination.matches("/add-.*")) {		
+				if (itemType.equalsIgnoreCase(ItemType.PRODUCT.name())) {
+					List<Item> categories = getAllItemsOperation("CATEGORY");
+					request.setAttribute("categories", categories);
+					forwardStream(request, response, "/add-product.jsp");
+					
+				} else if (itemType.equalsIgnoreCase(ItemType.CATEGORY.name())) {	
+					forwardStream(request, response, "/add-category.jsp");
+				}
+				
+				return ;
+			}
+			
+			result = addItemOpreation(itemType, request, response);
+			
+			if (result) {
+				message = "add successully";
+			}
+		
+		} else if (action.equals("update")) {
+			int id = Integer.parseInt(itemId);
+//			System.out.println(destination);
+//			System.out.println(destination.matches("/update-.*"));
+			
+			if (!destination.matches("/update-.*")) {
+				Item item = getItemOperation(itemType, id);
+				request.setAttribute("item", item);
+				request.setAttribute("oldId", id);
+				
+				if (itemType.equalsIgnoreCase(ItemType.PRODUCT.name())) {
+					List<Item> categories = getAllItemsOperation("CATEGORY");
+					request.setAttribute("categories", categories);
+					forwardStream(request, response, "/update-product.jsp");
+					
+				} else if (itemType.equalsIgnoreCase(ItemType.CATEGORY.name())) {	
+					forwardStream(request, response, "/update-category.jsp");
+				}
+				
+				return ;
+			}
+			
+			result = updateItemOperation(itemType, id, request, response);
+					
+			if (result) {
+				message = "add successully";
+			}
+		}
+		
+		request.setAttribute("message", message);
+		forwardStream(request, response, destination);
+	}
+	
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		String action = request.getParameter("action");
+		String itemType = request.getParameter("itemtype");
+		String itemId = request.getParameter("itemid");
+				
+		if (action == null) {
+			List<Item> items = getAllItemsOperation("PRODUCT");					
+			request.setAttribute("items", items);
+			forwardStream(request, response, "/home.jsp");
+		
+		} else if (action.equals("getallitems") && itemType.equalsIgnoreCase("CATEGORY")) {
+			List<Item> items = getAllItemsOperation("CATEGORY");
+			request.setAttribute("items", items);
+			forwardStream(request, response, "/categories-list.jsp");
+			
+	    } else {
+			if (action.equals("getitem") && itemType != null && itemId != null) {
+				Item item = null;
+				int id = Integer.parseInt(itemId);
+				getItemOperation(itemType, id);
+				request.setAttribute("item", item); 
+				
+			} else {
+				request.setAttribute("message", "cannot do this operation");
+			}
+			forwardStream(request, response, "/item-detail.jsp");
+		}
+		
+		
+	}
 
     private List<Item> getAllItemsOperation(String itemType) {
     	List<Item> items = null;
@@ -62,29 +187,7 @@ public class ItemService extends HttpServlet {
     	return item;
     }
     
-	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		String action = request.getParameter("action");
-		String itemType = request.getParameter("itemtype");
-		String itemId = request.getParameter("itemid");
-		
-		if (action == null) return;
-		
-		if (action.equals("getallitems") && itemType != null) {
-			List<Item> items = getAllItemsOperation(itemType);					
-			request.setAttribute("items", items);
-		
-		} else if (action.equals("getitem") && itemType != null && itemId != null) {
-			Item item = null;
-			int id = Integer.parseInt(itemId);
-			getItemOperation(itemType, id);
-			request.setAttribute("item", item); 
-			
-		} else {
-			request.setAttribute("message", "cannot do this operation");
-		}
-		
-		forwardStream(request, response, "/items-list.jsp");
-	}
+	
 	
 	private boolean removeItemOperation(String itemType, int id) {
 		boolean result = false;
@@ -132,20 +235,20 @@ public class ItemService extends HttpServlet {
 		boolean result = false;
 		
 		if (itemType.equalsIgnoreCase(ItemType.CATEGORY.name())) {
-			String newcategoryIdStr = request.getParameter("newcategoryid");
+			String newcategoryIdStr = request.getParameter("categoryid");
 			int newId = Integer.parseInt(newcategoryIdStr);
 			String categoryName = request.getParameter("categoryname");
 			result = transaction.updateCategory(id, newId, categoryName);
 		
 		} else if (itemType.equalsIgnoreCase(ItemType.PRODUCT.name())) {
-			String newcategoryIdStr = request.getParameter("newproductid");
-			int newId = Integer.parseInt(newcategoryIdStr);
+			String newProductIdStr = request.getParameter("productid");
+			int newId = Integer.parseInt(newProductIdStr);
 			String productName = request.getParameter("productname");
 			String priceStr = request.getParameter("productprice");
 			double price = Double.parseDouble(priceStr);
 			String quantityStr = request.getParameter("quantity");
 			int quantity = Integer.parseInt(quantityStr);
-			String categoryIdStr = request.getParameter("categoryname");
+			String categoryIdStr = request.getParameter("categoryid");
 			int categoryId = Integer.parseInt(categoryIdStr);
 			String description = request.getParameter("description");
 			
@@ -157,60 +260,6 @@ public class ItemService extends HttpServlet {
 		return result;
 	}
 
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		HttpSession session = request.getSession();
-		String destination = (String) session.getAttribute("request_from");
-		Account account = (Account) session.getAttribute("session_account");
-		
-		if (account == null) {
-			request.setAttribute("message", "You have not logged in");
-			forwardStream(request, response, destination);
-		}
-		
-		String accountType = account.getAccoutType();
-		if (!accountType.equalsIgnoreCase("STAFF")) {
-			request.setAttribute("message", "You have not privilege");
-			forwardStream(request, response, destination);
-		}
-		
-		String action = request.getParameter("action");
-		String itemType = request.getParameter("itemtype");
-		String itemId = request.getParameter("itemid");
-		
-		if (action == null || itemType == null)
-			return ;
-				
-		boolean result = false;
-		String message = "cannot do this operation";
-		
-		if (action.equals("remove")) {
-			int id = Integer.parseInt(itemId);
-			result = removeItemOperation(itemType, id);
-			
-			if (result) {
-				message = "remove successfully!";
-				destination = "/home.jsp";
-			}
-			
-		} else if (action.equals("add")) {
-			result = addItemOpreation(itemType, request, response);
-			
-			if (result) {
-				message = "add successully";
-			}
-		
-		} else if (action.equals("update")) {
-			int id = Integer.parseInt(itemId);
-			result = updateItemOperation(itemType, id, request, response);
-					
-			if (result) {
-				message = "add successully";
-			}
-		}
-		
-		request.setAttribute("message", message);
-		forwardStream(request, response, destination);
-	}
 
 	private void forwardStream(HttpServletRequest req, HttpServletResponse rsp, String destination)
 			throws ServletException, IOException {

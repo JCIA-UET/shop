@@ -8,6 +8,6 @@
 </head>
 <body>
  	<h1>${message}</h1>
- 	<p>Click <a href="home.jsp">here</a> to back to home</p>
+ 	<p>Click <a href="ItemService">here</a> to back to home</p>
 </body>
 </html>
