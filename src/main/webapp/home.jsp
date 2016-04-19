@@ -77,6 +77,7 @@
 		<input type="hidden" name="itemtype" value="PRODUCT">
 		<button type="submit">Add more products</button>
 	</form>
+	<a href='addResult.jsp'>View Cart</a>
 	
 </body>
 </html>

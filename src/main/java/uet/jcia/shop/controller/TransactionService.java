@@ -31,10 +31,11 @@ public class TransactionService extends HttpServlet {
 		HttpSession session = request.getSession();
 		Account account = (Account) session.getAttribute("session_account");
 		String accountType = account.getAccoutType();
-		if (!accountType.equals("STAFF")) return ;
+		//if (!accountType.equals("STAFF")) return ;
 		
 		String action = request.getParameter("action");
-		if (action == null) return ;
+		
+		String URL = null;
 		
 		String message = "cannot do this operation";
 		
@@ -42,14 +43,18 @@ public class TransactionService extends HttpServlet {
 			int customerId = (int) session.getAttribute("customer_id");
 			List<Product> shoppingCart = 
 					(List<Product>)session.getAttribute("shopping_cart");
-			transaction.doBuy(customerId, shoppingCart);
-			message = "buy successfully";
+			boolean test = transaction.doBuy(customerId, shoppingCart);
+			if(test){
+				message = "Buy Successfull";
+			}
+			else message = "Buy fails";
+			URL = "/buyResult.jsp";
 		
 		} else if (action.equals("cancelorder")) {
 			String orderIdStr = request.getParameter("orderid");
 			int orderId = Integer.parseInt(orderIdStr);
 			
-			transaction.doCancel(orderId);
+			boolean test =  transaction.doCancel(orderId);
 			message = "cancel successfully";
 		}
 		else if (action.equals("addToCart")){
@@ -60,20 +65,20 @@ public class TransactionService extends HttpServlet {
 			int quantity1 = Integer.parseInt(quantity);
 			Product product =(Product) session.getAttribute("product");
 			product.setQuantity(quantity1);
-			shoppingCart.set(0, product);
+			shoppingCart.add(product);
 			session.setAttribute("shopping_cart", shoppingCart);
-			forwardStream(request, response, "/addResult.jsp");
+			URL =  "/addResult.jsp";
 		}
 		else if(action.equals("add")){
 			String idProduct = request.getParameter("idProduct");
 			int idProduct1 = Integer.parseInt(idProduct);
 			Product product =(Product) transaction.getItemById(ItemType.PRODUCT, idProduct1);
 			session.setAttribute("product", product);
-			forwardStream(request, response, "/addToCart.jsp");
+			URL = "/addToCart.jsp";
 		}
 		
 		request.setAttribute("message", message);
-
+		forwardStream(request, response, URL);
 	}
 	
 	private void forwardStream(HttpServletRequest req, HttpServletResponse rsp, String destination)

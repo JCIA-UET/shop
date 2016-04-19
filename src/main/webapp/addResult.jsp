@@ -8,8 +8,22 @@
 <title>Insert title here</title>
 </head>
 <body>
-	<c:forEach var="item" items="${shopping_cart}">
-		<h1>"${item.name}"</h1>
-	</c:forEach>
+	<table>
+			<tr>
+			  <th>Name</th>
+			  <th>Quantity</th>
+			</tr>
+		<c:forEach var="item" items="${shopping_cart}">
+			<tr>
+			  <td>${item.name}</td>
+			  <td>${item.quantity}</td>
+			</tr>
+		</c:forEach>
+	</table>
+	<form method="post" action="TransactionService">
+		<input type="hidden" name="action" value="buy">
+		<input type="submit" value="pay" >
+	</form>
+		
 </body>
 </html>
