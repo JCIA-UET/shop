@@ -1,6 +1,7 @@
 package uet.jcia.shop.controller;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.RequestDispatcher;
@@ -13,6 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import uet.jcia.shop.model.Account;
+import uet.jcia.shop.model.ItemType;
 import uet.jcia.shop.model.Product;
 import uet.jcia.shop.model.Transaction;
 
@@ -39,8 +41,7 @@ public class TransactionService extends HttpServlet {
 		if (action.equals("buy")) {
 			int customerId = (int) session.getAttribute("customer_id");
 			List<Product> shoppingCart = 
-					(List<Product>) session.getAttribute("shopping_cart");
-			
+					(List<Product>)session.getAttribute("shopping_cart");
 			transaction.doBuy(customerId, shoppingCart);
 			message = "buy successfully";
 		
@@ -51,9 +52,28 @@ public class TransactionService extends HttpServlet {
 			transaction.doCancel(orderId);
 			message = "cancel successfully";
 		}
+		else if (action.equals("addToCart")){
+			List<Product> shoppingCart = 
+					(List<Product>) session.getAttribute("shopping_cart");
+			session.removeAttribute("shopping_cart");
+			String quantity = request.getParameter("quantity");
+			int quantity1 = Integer.parseInt(quantity);
+			Product product =(Product) session.getAttribute("product");
+			product.setQuantity(quantity1);
+			shoppingCart.set(0, product);
+			session.setAttribute("shopping_cart", shoppingCart);
+			forwardStream(request, response, "/addResult.jsp");
+		}
+		else if(action.equals("add")){
+			String idProduct = request.getParameter("idProduct");
+			int idProduct1 = Integer.parseInt(idProduct);
+			Product product =(Product) transaction.getItemById(ItemType.PRODUCT, idProduct1);
+			session.setAttribute("product", product);
+			forwardStream(request, response, "/addToCart.jsp");
+		}
 		
 		request.setAttribute("message", message);
-		forwardStream(request, response, "/mvma.jsp");
+
 	}
 	
 	private void forwardStream(HttpServletRequest req, HttpServletResponse rsp, String destination)
