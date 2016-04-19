@@ -17,16 +17,9 @@ public class Product extends Item {
 		this.categoryId = categoryId;
 		this.description = description;
 	}
-
-
-
-	public Product(
-			int id, String name,
-			int quantity, double price, int categoryId, String description) {
-		
-		super();
-		this.id = id;
-		this.name = name;
+	
+	public Product(int id, String name, int quantity, double price, int categoryId, String description) {
+		super(id, name);
 		this.quantity = quantity;
 		this.price = price;
 		this.categoryId = categoryId;

@@ -20,9 +20,9 @@ public class OrderManager implements ItemManager {
 	private final String ADD_NEW_ORDER_QUERY	 		= "INSERT INTO shop.order (customerID) VALUES(?)";
 	private final String ADD_NEW_ORDERDETAIL_QUERY		= "INSERT INTO shop.orderdetail (orderID, productID, quantity, orderDate) VALUES (?,?,?,now())";
 	private final String GET_TOP_SELLING_PRODUCT_QUERY 	= "SELECT product.productID, SUM(orderdetail.Quantity) AS Quantity FROM orderdetail INNER JOIN product ON product.productID = orderdetail.productID GROUP BY orderdetail.productID ORDER BY Quantity DESC LIMIT ?";
-	private final String GET_REVENUE_IN_DAY_QUERY 		= "SELECT DATE(orderDate) AS Date, SUM(orderdetail.quantity * product.price) AS Revenue FROM shop.orderdetail LEFT JOIN product ON product.productID = orderdetail.productID WHERE DATE(orderDate)=?";
-	private final String GET_REVENUE_IN_MONTH_QUERY		= "SELECT MONTH(DATE(orderDate)) as Month, SUM(orderdetail.quantity * product.price) AS Revenue FROM shop.orderdetail LEFT JOIN product ON product.productID = orderdetail.productID WHERE DATE(orderDate) BETWEEN ? AND ?";
-	private final String GET_TOTAL_REVENUE_QUERY		= "SELECT SUM(orderdetail.quantity * product.price) as Revenue FROM shop.orderdetail LEFT JOIN product ON product.productID = orderdetail.productID";
+	private final String GET_REVENUE_IN_DAY_QUERY 		= "SELECT DATE(orderDate) AS Date, orderdetail.quantity, SUM(orderdetail.quantity * product.price) AS Revenue FROM shop.orderdetail LEFT JOIN product ON product.productID = orderdetail.productID WHERE DATE(orderDate)=? GROUP BY orderId, orderdetail.productID";
+	private final String GET_REVENUE_IN_MONTH_QUERY		= "SELECT MONTH(DATE(orderDate)) as Month, orderdetail.quantity, SUM(orderdetail.quantity * product.price) AS Revenue FROM shop.orderdetail LEFT JOIN product ON product.productID = orderdetail.productID WHERE DATE(orderDate) BETWEEN ? AND ? GROUP BY orderId, orderdetail.productID";
+	private final String GET_TOTAL_REVENUE_QUERY		= "SELECT orderdetail.quantity, SUM(orderdetail.quantity * product.price) as Revenue FROM shop.orderdetail LEFT JOIN product ON product.productID = orderdetail.productID GROUP BY orderId, orderdetail.productID";
 	
 	/**
 	 * get order 
@@ -251,7 +251,9 @@ public class OrderManager implements ItemManager {
 			ResultSet rs = stt.executeQuery();
 			while(rs.next()) {
 				int productID = rs.getInt("productID");
+				int quantity = rs.getInt("Quantity");
 				Product product = (Product)pm.getItemById(productID);
+				product.setQuantity(quantity);
 				list.add(product);
 			}
 			return list;
@@ -266,23 +268,28 @@ public class OrderManager implements ItemManager {
 	 * @param date				the day we want to see revenue
 	 * @return revenue			revenue of this day
 	 */
-	public double calDailyRevenue(Date date) {
+	public double[] calDailyRevenue(Date date) {
 		conn = dbConnector.createConnection();
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 		String szDate = sdf.format(date);
+		double[] arr = new double[3];
 		
 		try {
 			PreparedStatement stt = conn.prepareStatement(GET_REVENUE_IN_DAY_QUERY);
 			stt.setString(1, szDate);
 			
 			ResultSet rs = stt.executeQuery();
-			rs.next();
-			double revenue = rs.getDouble("Revenue");
-			return revenue;
+			while(rs.next()) {
+				arr[0]++;
+				arr[1] += (double)rs.getInt("quantity");
+				arr[2] += rs.getInt("Revenue");
+			}
+			return arr;
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			return 0;
+			arr[0] = arr[1] = arr[2] = 0.0;
+			return arr;
 		}
 		finally {
 			try {
@@ -300,10 +307,10 @@ public class OrderManager implements ItemManager {
 	 * @return revenue			revenue of this month
 	 */
 	
-	public double calMonthRevenue(int month) {
+	public double[] calMonthRevenue(int month) {
 		int lastDay;
 		String szDate;
-		
+		double[] arr = new double[3];
 		conn = dbConnector.createConnection();
 	
 		if(month == 1 || month == 3 || month == 5 || month == 7 || month == 8 || month == 10 || month == 12) lastDay = 31;
@@ -318,13 +325,17 @@ public class OrderManager implements ItemManager {
 			stt.setString(2, szDate);
 			
 			ResultSet rs = stt.executeQuery();
-			rs.next();
-			double revenue = rs.getDouble("Revenue");
-			return revenue;
+			while(rs.next()) {
+				arr[0]++;
+				arr[1] += (double)rs.getInt("quantity");
+				arr[2] += rs.getInt("Revenue");
+			}
+			return arr;
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			return 0;
+			arr[0] = arr[1] = arr[2] = 0.0;
+			return arr;
 		}
 		finally {
 			try {
@@ -341,19 +352,25 @@ public class OrderManager implements ItemManager {
 	 * @param month
 	 * @return
 	 */
-	public double calTotalRevenue() {
+	public double[] calTotalRevenue() {
 		conn = dbConnector.createConnection();
+		double[] arr = new double[3];
 		try {
 			PreparedStatement stt = conn.prepareStatement(GET_TOTAL_REVENUE_QUERY);
 			ResultSet rs = stt.executeQuery();
-			rs.next();
 			
-			double revenue = rs.getDouble("Revenue");
-			return revenue;
+			while(rs.next()) {
+				arr[0]++;
+				arr[1] += (double)rs.getInt("quantity");
+				arr[2] += rs.getInt("Revenue");
+			}
+			
+			return arr;
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			return 0;
+			arr[0] = arr[1] = arr[2] = 0.0;
+			return arr;
 		}
 		finally {
 			try {

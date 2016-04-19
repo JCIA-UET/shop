@@ -6,8 +6,8 @@ public class DBConnector {
 	private static final String JDBC_DRIVER = "com.mysql.jdbc.Driver";
 
 	private static final String DB_URL = "jdbc:mysql://localhost:3306/shop?useSSL=false";
-	private static final String USERNAME = "bqcuong"; 
-	private static final String PASSWORD = "buiquangcuong";
+	private static final String USERNAME = "root"; 
+	private static final String PASSWORD = "hakiem09";
 	private static Connection con = null;
 	private static DBConnector connector = new DBConnector();
 	
