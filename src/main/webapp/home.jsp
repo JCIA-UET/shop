@@ -54,6 +54,11 @@
 							<input type="hidden" name="itemid" value="${item.id}">
 							<button type="submit">Remove</button>
 						</form>
+						<form action="TransactionService" method="post">
+							<input type="hidden" name="action" value="add" />
+							<input type="hidden" name="idProduct" value="${item.id}" />
+							<input type="submit" value="ADD">
+						</form>
 					</td>
 				</tr>
 			</c:forEach>
@@ -72,6 +77,7 @@
 		<input type="hidden" name="itemtype" value="PRODUCT">
 		<button type="submit">Add more products</button>
 	</form>
+	<a href='addResult.jsp'>View Cart</a>
 	
 </body>
 </html>
