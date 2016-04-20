@@ -11,18 +11,9 @@ public class Transaction {
 	private CategoryManager categoryManager = new CategoryManager();
 	
 	public boolean doBuy(int customerId, List<Product> products) {
+		Order order = new Order(customerId);
 		
-		List<OrderDetails> listOrderDetail = new ArrayList<OrderDetails>();
-		for(int i = 0 ; i < products.size();i++){
-			Product check =(Product) productManager.getItemById(products.get(i).getId());
-			if(check.getQuantity() < products.get(i).getQuantity())
-				return false; // vi so luong trong kho nho hon so luong yeu cau
-			listOrderDetail.add(new OrderDetails(customerId,products.get(i).getId(),
-					products.get(i).getQuantity(), null));
-		}
-		Order order = new Order(customerId, listOrderDetail);
-		boolean result = orderManager.addItem(order);
-		return result;
+		return orderManager.addItem(order, products);
 	}
 	
 	public boolean doCancel( int orderId){

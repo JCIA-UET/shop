@@ -26,11 +26,6 @@ import uet.jcia.shop.model.Transaction;
 public class ItemService extends HttpServlet {
 	private static final long serialVersionUID = 1L;
     private Transaction transaction = new Transaction();
-    
-    public ItemService() {
-        super();
-    }
-    
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		HttpSession session = request.getSession();

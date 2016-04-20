@@ -23,6 +23,7 @@ public class OrderManager implements ItemManager {
 	private final String GET_REVENUE_IN_DAY_QUERY 		= "SELECT DATE(orderDate) AS Date, orderdetail.quantity, SUM(orderdetail.quantity * product.price) AS Revenue FROM shop.orderdetail LEFT JOIN product ON product.productID = orderdetail.productID WHERE DATE(orderDate)=? GROUP BY orderId, orderdetail.productID";
 	private final String GET_REVENUE_IN_MONTH_QUERY		= "SELECT MONTH(DATE(orderDate)) as Month, orderdetail.quantity, SUM(orderdetail.quantity * product.price) AS Revenue FROM shop.orderdetail LEFT JOIN product ON product.productID = orderdetail.productID WHERE DATE(orderDate) BETWEEN ? AND ? GROUP BY orderId, orderdetail.productID";
 	private final String GET_TOTAL_REVENUE_QUERY		= "SELECT orderdetail.quantity, SUM(orderdetail.quantity * product.price) as Revenue FROM shop.orderdetail LEFT JOIN product ON product.productID = orderdetail.productID GROUP BY orderId, orderdetail.productID";
+	private final String GET_LAST_ORDER_QUERY 			= "SELECT * FROM shop.order ORDER BY orderID DESC LIMIT 1";
 	
 	/**
 	 * get order 
@@ -177,7 +178,7 @@ public class OrderManager implements ItemManager {
 		return list;
 	}
 	
-	public boolean addDetailToOrder(OrderDetails detail) {
+	public boolean addOrderDetailToDB(OrderDetails detail) {
 		conn = dbConnector.createConnection();
 		
 		try {
@@ -185,6 +186,8 @@ public class OrderManager implements ItemManager {
 			stt.setInt(1, detail.getOrderId());
 			stt.setInt(2, detail.getProductId());
 			stt.setInt(3, detail.getQuantity());
+			
+			System.out.println(detail.getOrderId() + "-----------");
 			
 			stt.executeUpdate();
 			return true;
@@ -233,6 +236,57 @@ public class OrderManager implements ItemManager {
 				e.printStackTrace();
 			}
 		}
+	}
+	
+	public Order getLastOrder() {
+		conn = dbConnector.createConnection();
+		Order order = null;
+		try {
+			PreparedStatement stt = conn.prepareStatement(GET_LAST_ORDER_QUERY);
+			ResultSet rs = stt.executeQuery();
+			if (rs.next()) {
+				int id = rs.getInt(1);
+				int customerId = rs.getInt(2);
+				order = new Order(id, customerId, null);
+				
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		finally {
+			try {
+				conn.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		return order;
+	}
+	
+	public boolean addItem(Order order, List<Product> products) {
+		if(!(order instanceof Order)) return false;
+		
+		List<OrderDetails> list = new ArrayList<>();
+		
+		if (!addItem(order)) {
+			return false;
+		}
+		
+		order = getLastOrder();
+		
+		OrderDetails temp;
+		for (Product p : products) {
+			 temp = new OrderDetails(order.getOrderId(), order.getCustomerId(),
+					 p.getQuantity(), null);
+			 
+			 list.add(temp);
+			 if (!addOrderDetailToDB(temp)) {
+				 return false;
+			 }
+		}
+		order.setOrderDetails(list);
+		return true;
 	}
 	
 	/**

@@ -7,6 +7,7 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<title>Shopping</title>
 	<link href="style.css" rel="stylesheet"/>
+	<link href="css/style.css" rel="stylesheet"/>
 	<%session.setAttribute("request_from","/home.jsp"); %>
 </head>
 <body>
@@ -15,44 +16,42 @@
 	<jsp:include page="header.jsp"></jsp:include>
 	
 	<c:if test="${not empty items}">
-		<table>
-			<tr>
-				<th>ID</th>
-				<th>Name</th>
-				<th>Price</th>
-				<th>Category</th>
-				<th>Description</th>
-				<th>Operation</th>
-			</tr>
-			<c:forEach var="item" items="${items}">
-				<tr>
-					<td>${item.id}</td>
-					<td>${item.name}</td>
-					<td>${item.price}</td>
-					<td>${item.categoryId}</td>
-					<td>${item.description}</td>
-					<td>
+		<c:forEach var="item" items="${items}">
+			<div class="product">
+				<div class="productname"> ${item.name}</div>
+				<div class="productprice">${item.price}</div>
+				<div class="pcategory">${item.categoryId}</div>
+				<div class="description">${item.description}</div>
+				<div class="operation">
+				<hr/>
+					<ul>
+						<li class="update">
 						<form action="ItemService">
 							<input type="hidden" name="action" value="requestupdate">
 							<input type="hidden" name="itemtype" value="PRODUCT">
 							<input type="hidden" name="itemid" value="${item.id}">
 							<button type="submit">Update</button>
 						</form>
+						</li>
+						<li class="remove">
 						<form action="ItemService" method="post">
 							<input type="hidden" name="action" value="remove">
 							<input type="hidden" name="itemtype" value="PRODUCT">
 							<input type="hidden" name="itemid" value="${item.id}">
 							<button type="submit">Remove</button>
 						</form>
-						<form action="TransactionService">
-							<input type="hidden" name="action" value="requestaddtocart" />
-							<input type="hidden" name="idProduct" value="${item.id}" />
-							<button type="submit">Add to cart</button>
-						</form>
-					</td>
-				</tr>
-			</c:forEach>
-		</table>
+						</li>
+						<li>
+							<form action="TransactionService">
+								<input type="hidden" name="action" value="requestaddtocart" />
+								<input type="hidden" name="idProduct" value="${item.id}" />
+								<button type="submit">Add to cart</button>
+							</form>
+						</li>
+					</ul>
+				</div>
+			</div>
+		</c:forEach>
 	</c:if>	
 	
 	<!-- footer -->

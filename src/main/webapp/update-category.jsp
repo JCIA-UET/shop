@@ -29,13 +29,7 @@
 		<br/>
 		<button type="submit">Submit</button>
 	</form>
-	<br/>
-	<form action="ItemService" method="get">
-		<input type="hidden" name="action" value="getallitems">
-		<input type="hidden" name="itemtype" value="CATEGORY">
-		<button type="submit">See categories list</button>
-	</form>
-	
+
 	<!-- footer -->
 	<jsp:include page="footer.jsp"></jsp:include>
 </body>
