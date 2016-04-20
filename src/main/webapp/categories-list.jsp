@@ -5,24 +5,13 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<title>Categories List</title>
-<link href="style.css" rel="stylesheet"/>
+	<title>Categories List</title>
+	<link href="style.css" rel="stylesheet"/>
+	<%session.setAttribute("request_from","/categories-list.jsp"); %>
 </head>
 <body>
-	<%session.setAttribute("request_from","/categories-list.jsp"); %>
-	
-	<c:if test="${not empty message}">
-		<h2 style="color:blue;">${message}</h2>
-	</c:if>
-	
-	<c:choose>
-		<c:when test="${not empty sessionScope.session_account}">
-			<p class="welcome">Welcome, <strong>${sessionScope.session_account.username}</strong></p>
-		</c:when>
-		<c:otherwise>
-			<p class="welcome">Please <a href="login.jsp">login</a>
-		</c:otherwise>
-	</c:choose>
+	<!-- header -->
+	<jsp:include page="header.jsp"></jsp:include>
 	
 	<c:if test="${not empty items}">
 		<table>
@@ -35,8 +24,8 @@
 					<td>${item.id}</td>
 					<td>${item.name}</td>
 					<td>
-						<form action="ItemService" method="post">
-							<input type="hidden" name="action" value="update">
+						<form action="ItemService">
+							<input type="hidden" name="action" value="requestupdate">
 							<input type="hidden" name="itemtype" value="CATEGORY">
 							<input type="hidden" name="itemid" value="${item.id}">
 							<button type="submit">Update</button>
@@ -53,11 +42,7 @@
 		</table>
 	</c:if>
 	
-	<br/>
-		<form action="ItemService" method="post">
-			<input type="hidden" name="action" value="add">
-			<input type="hidden" name="itemtype" value="CATEGORY">
-			<button type="submit">Add more categories</button>
-		</form>
+	<!-- footer -->
+	<jsp:include page="footer.jsp"></jsp:include>
 </body>
 </html>

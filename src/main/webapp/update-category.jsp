@@ -5,23 +5,14 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<title>Update category</title>
-<link href="style.css" rel="stylesheet"/>
+	<title>Update category</title>
+	<link href="style.css" rel="stylesheet"/>
+	<%session.setAttribute("request_from","/update-category.jsp"); %>
 </head>
 <body>
-	<%session.setAttribute("request_from","/update-category.jsp"); %>
-	<c:if test="${not empty message}">
-		<h2 style="color:blue;">${message}</h2>
-	</c:if>
 	
-	<c:choose>
-		<c:when test="${not empty sessionScope.session_account}">
-			<p class="welcome">Welcome, <strong>${sessionScope.session_account.username}</strong></p>
-		</c:when>
-		<c:otherwise>
-			<p class="welcome">Please <a href="login.jsp">login</a>
-		</c:otherwise>
-	</c:choose>
+	<!-- header -->
+	<jsp:include page="header.jsp"></jsp:include>
 	
 	<form action="ItemService" method="post">
 		<input type="hidden" name="action" value="update">
@@ -44,5 +35,8 @@
 		<input type="hidden" name="itemtype" value="CATEGORY">
 		<button type="submit">See categories list</button>
 	</form>
+	
+	<!-- footer -->
+	<jsp:include page="footer.jsp"></jsp:include>
 </body>
 </html>

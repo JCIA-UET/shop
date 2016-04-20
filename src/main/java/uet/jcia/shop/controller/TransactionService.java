@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import javax.websocket.Session;
 
 import uet.jcia.shop.model.Account;
 import uet.jcia.shop.model.ItemType;
@@ -28,27 +29,39 @@ public class TransactionService extends HttpServlet {
     }
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		HttpSession session = request.getSession();
-		Account account = (Account) session.getAttribute("session_account");
-		String accountType = account.getAccoutType();
-		//if (!accountType.equals("STAFF")) return ;
-		
-		String action = request.getParameter("action");
-		
-		String URL = null;
-		
 		String message = "cannot do this operation";
 		
-		if (action.equals("buy")) {
+		HttpSession session = request.getSession();
+		String destination = (String) session.getAttribute("request_from");
+		Account account = (Account) session.getAttribute("session_account");
+		if (account == null) {
+			request.setAttribute("message", "You have not logged in");
+			forwardStream(request, response, destination);
+			return ;
+		}
+		
+		String accountType = account.getAccoutType();
+		String action = request.getParameter("action");
+		
+		if (!accountType.equalsIgnoreCase("CUSTOMER")) {
+			System.out.println(accountType +"----"+destination);
+			message = "you have not previlege";
+			
+		} else if (action == null) {
+			
+		} else if (action.equals("buy")) {
 			int customerId = (int) session.getAttribute("customer_id");
 			List<Product> shoppingCart = 
 					(List<Product>)session.getAttribute("shopping_cart");
 			boolean test = transaction.doBuy(customerId, shoppingCart);
+			
 			if(test){
 				message = "Buy Successfull";
+			} else {
+				message = "Buy fails";
 			}
-			else message = "Buy fails";
-			URL = "/buyResult.jsp";
+			
+			destination = "/buyResult.jsp";
 		
 		} else if (action.equals("cancelorder")) {
 			String orderIdStr = request.getParameter("orderid");
@@ -56,29 +69,56 @@ public class TransactionService extends HttpServlet {
 			
 			boolean test =  transaction.doCancel(orderId);
 			message = "cancel successfully";
-		}
-		else if (action.equals("addToCart")){
+			
+		} else if (action.equals("addToCart")){
 			List<Product> shoppingCart = 
 					(List<Product>) session.getAttribute("shopping_cart");
-			session.removeAttribute("shopping_cart");
-			String quantity = request.getParameter("quantity");
-			int quantity1 = Integer.parseInt(quantity);
-			Product product =(Product) session.getAttribute("product");
-			product.setQuantity(quantity1);
+			
+			String quantityStr = request.getParameter("quantity");
+			String productIdStr = request.getParameter("productid");
+			String productName = request.getParameter("productname");
+					
+					
+			int quantity = Integer.parseInt(quantityStr);
+			int productId = Integer.parseInt(productIdStr);
+			
+			Product product = new Product();
+			product.setId(productId);
+			product.setName(productName);
+			product.setQuantity(quantity);
+			
 			shoppingCart.add(product);
-			session.setAttribute("shopping_cart", shoppingCart);
-			URL =  "/addResult.jsp";
+			
+			message = "add to cart successfully!";
+			destination =  "/addResult.jsp";
 		}
-		else if(action.equals("add")){
+		
+		request.setAttribute("message", message);
+		forwardStream(request, response, destination);
+	}
+	
+	@Override
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		String action = request.getParameter("action");
+		if (action == null) return;
+
+		String message = null;
+		HttpSession session = request.getSession();
+		String destination = (String) session.getAttribute("request_from");
+			
+		if (action.equals("requestaddtocart")){
 			String idProduct = request.getParameter("idProduct");
 			int idProduct1 = Integer.parseInt(idProduct);
 			Product product =(Product) transaction.getItemById(ItemType.PRODUCT, idProduct1);
 			session.setAttribute("product", product);
-			URL = "/addToCart.jsp";
+			destination = "/addToCart.jsp";
+		
+		} else {
+			message = "cannot do this operation";
 		}
 		
 		request.setAttribute("message", message);
-		forwardStream(request, response, URL);
+		forwardStream(request, response, destination);
 	}
 	
 	private void forwardStream(HttpServletRequest req, HttpServletResponse rsp, String destination)

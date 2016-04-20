@@ -100,12 +100,12 @@ public class Transaction {
 		List<Product> products = (List<Product>)(List<?>) items;
 		return products;
 	}
-	public double getDailyRevenue(Date date){
-		double result = orderManager.calDailyRevenue(date);
-		return result;
-	}
-	public double getTotalRevenue(){
-		double result = orderManager.calTotalRevenue();
-		return result;
-	}
+//	public double getDailyRevenue(Date date){
+//		double result = orderManager.calDailyRevenue(date);
+//		return result;
+//	}
+//	public double getTotalRevenue(){
+//		double result = orderManager.calTotalRevenue();
+//		return result;
+//	}
 }

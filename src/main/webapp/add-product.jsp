@@ -4,24 +4,14 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<title>Add new product</title>
-<link href="style.css" rel="stylesheet"/>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<title>Add new product</title>
+	<link href="style.css" rel="stylesheet"/>
+	<%session.setAttribute("request_from","/add-product.jsp"); %>
 </head>
 <body>
-	<%session.setAttribute("request_from","/add-product.jsp"); %>
-	<c:if test="${not empty message}">
-		<h2 style="color:blue;">${message}</h2>
-	</c:if>
-	
-	<c:choose>
-		<c:when test="${not empty sessionScope.session_account}">
-			<p class="welcome">Welcome, <strong>${sessionScope.session_account.username}</strong></p>
-		</c:when>
-		<c:otherwise>
-			<p class="welcome">Please <a href="login.jsp">login</a>
-		</c:otherwise>
-	</c:choose>
+	<!-- header -->
+	<jsp:include page="header.jsp"></jsp:include>
 	
 	<form action="ItemService" method="post" id="add-product">
 		<input type="hidden" name="action" value="add">
@@ -53,9 +43,8 @@
 		<br/>
 		<button type="submit">Submit</button>
 	</form>
-	<br/>
-	<form action="ItemService">
-		<button type="submit">See products list</button>
-	</form>	
+	
+	<!-- footer -->
+	<jsp:include page="footer.jsp"></jsp:include>
 </body>
 </html>

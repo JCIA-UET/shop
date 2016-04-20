@@ -69,23 +69,7 @@ public class ItemService extends HttpServlet {
 				destination = "/home.jsp";
 			}
 			
-		} else if (action.equals("add")) {
-//			System.out.println(destination);
-//			System.out.println(destination.matches("/add-.*"));
-			
-			if (!destination.matches("/add-.*")) {		
-				if (itemType.equalsIgnoreCase(ItemType.PRODUCT.name())) {
-					List<Item> categories = getAllItemsOperation("CATEGORY");
-					request.setAttribute("categories", categories);
-					forwardStream(request, response, "/add-product.jsp");
-					
-				} else if (itemType.equalsIgnoreCase(ItemType.CATEGORY.name())) {	
-					forwardStream(request, response, "/add-category.jsp");
-				}
-				
-				return ;
-			}
-			
+		} else if (action.equals("add")) {			
 			result = addItemOpreation(itemType, request, response);
 			
 			if (result) {
@@ -94,30 +78,10 @@ public class ItemService extends HttpServlet {
 		
 		} else if (action.equals("update")) {
 			int id = Integer.parseInt(itemId);
-//			System.out.println(destination);
-//			System.out.println(destination.matches("/update-.*"));
-			
-			if (!destination.matches("/update-.*")) {
-				Item item = getItemOperation(itemType, id);
-				request.setAttribute("item", item);
-				request.setAttribute("oldId", id);
-				
-				if (itemType.equalsIgnoreCase(ItemType.PRODUCT.name())) {
-					List<Item> categories = getAllItemsOperation("CATEGORY");
-					request.setAttribute("categories", categories);
-					forwardStream(request, response, "/update-product.jsp");
-					
-				} else if (itemType.equalsIgnoreCase(ItemType.CATEGORY.name())) {	
-					forwardStream(request, response, "/update-category.jsp");
-				}
-				
-				return ;
-			}
-			
 			result = updateItemOperation(itemType, id, request, response);
 					
 			if (result) {
-				message = "add successully";
+				message = "update successully";
 			}
 		}
 		
@@ -140,20 +104,35 @@ public class ItemService extends HttpServlet {
 			request.setAttribute("items", items);
 			forwardStream(request, response, "/categories-list.jsp");
 			
-	    } else {
-			if (action.equals("getitem") && itemType != null && itemId != null) {
-				Item item = null;
-				int id = Integer.parseInt(itemId);
-				getItemOperation(itemType, id);
-				request.setAttribute("item", item); 
+	    } else if (action.equals("requestadd")) {
+	    	if (itemType.equalsIgnoreCase(ItemType.PRODUCT.name())) {
+				List<Item> categories = getAllItemsOperation("CATEGORY");
+				request.setAttribute("categories", categories);
+				forwardStream(request, response, "/add-product.jsp");
 				
-			} else {
-				request.setAttribute("message", "cannot do this operation");
+			} else if (itemType.equalsIgnoreCase(ItemType.CATEGORY.name())) {	
+				forwardStream(request, response, "/add-category.jsp");
 			}
-			forwardStream(request, response, "/item-detail.jsp");
+	    
+		} else if (action.equals("requestupdate")) {
+			int id = Integer.parseInt(itemId);
+			Item item = getItemOperation(itemType, id);
+			request.setAttribute("item", item);
+			request.setAttribute("oldId", id);
+			
+			if (itemType.equalsIgnoreCase(ItemType.PRODUCT.name())) {
+				List<Item> categories = getAllItemsOperation("CATEGORY");
+				request.setAttribute("categories", categories);
+				forwardStream(request, response, "/update-product.jsp");
+				
+			} else if (itemType.equalsIgnoreCase(ItemType.CATEGORY.name())) {	
+				forwardStream(request, response, "/update-category.jsp");
+			}
+			
+		} else {
+			request.setAttribute("message", "cannot do this operation");
+			forwardStream(request, response, "/home.jsp");
 		}
-		
-		
 	}
 
     private List<Item> getAllItemsOperation(String itemType) {

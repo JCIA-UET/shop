@@ -56,7 +56,7 @@ public class LoginService extends HttpServlet {
 			session.setAttribute("session_account", account);
 			
 			// if user is Customer, add shopping cart to the session
-			if(account.getAccoutType().equals("CUSTOMER")){
+			if(account.getAccoutType().equalsIgnoreCase("CUSTOMER")){
 				List<Product> shoppingCart = new ArrayList<>();
 				session.setAttribute("shopping_cart", shoppingCart);	
 				session.setAttribute("customer_id", account.getAccountId());
